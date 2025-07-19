@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession, signOut } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import { ChevronLeft, ChevronRight, LogOut, Sun, Moon, Coffee, Home, Calendar as CalendarIcon } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Sun, Moon, Coffee, Home, Calendar as CalendarIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 type ShiftType = 'day' | 'night' | 'off' | 'holiday'
@@ -16,7 +16,7 @@ interface WorkSchedule {
 }
 
 const shiftConfig = {
-  day: { icon: Sun, label: '주간', color: 'bg-yellow-100 text-yellow-800 border-yellow-200', emoji: '☀️' },
+  day: { icon: Sun, label: '주', color: 'bg-yellow-100 text-yellow-800 border-yellow-200', emoji: '☀️' },
   night: { icon: Moon, label: '야간', color: 'bg-blue-100 text-blue-800 border-blue-200', emoji: '🌙' },
   off: { icon: Coffee, label: '비번', color: 'bg-green-100 text-green-800 border-green-200', emoji: '☕' },
   holiday: { icon: Home, label: '휴일', color: 'bg-red-100 text-red-800 border-red-200', emoji: '🏠' }
@@ -116,164 +116,154 @@ export default function Calendar() {
   }, [currentDate])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
-      <div className="container mx-auto px-4 py-4 max-w-6xl">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <div className="flex items-center space-x-3">
-            <CalendarIcon className="h-8 w-8 text-blue-600" />
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">교대 근무 달력</h1>
-              {session?.user?.name && (
-                <p className="text-sm text-gray-600">안녕하세요, {session.user.name}님!</p>
-              )}
-            </div>
+    <div className="container mx-auto px-4 py-4 max-w-6xl">
+      {/* Calendar */}
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden calendar-fade-in">
+        {/* Calendar Header */}
+        <div className="bg-white border-b border-gray-200 p-4">
+          <div className="flex items-center justify-between">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handlePrevMonth}
+              className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 touch-friendly"
+            >
+              <ChevronLeft className="h-5 w-5" />
+              {!isMobile && <span className="ml-2">이전</span>}
+            </Button>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+              {format(currentDate, 'yyyy년 M월', { locale: ko })}
+            </h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleNextMonth}
+              className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 touch-friendly"
+            >
+              {!isMobile && <span className="mr-2">다음</span>}
+              <ChevronRight className="h-5 w-5" />
+            </Button>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => signOut()}
-            className="touch-friendly flex items-center space-x-2"
-          >
-            <LogOut className="h-4 w-4" />
-            <span>로그아웃</span>
-          </Button>
         </div>
 
-        {/* Calendar */}
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden calendar-fade-in">
-          {/* Calendar Header */}
-          <div className="bg-blue-600 text-white p-4">
-            <div className="flex items-center justify-between">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handlePrevMonth}
-                className="text-white hover:bg-blue-700 touch-friendly"
-              >
-                <ChevronLeft className="h-5 w-5" />
-                {!isMobile && <span className="ml-2">이전</span>}
-              </Button>
-              <h2 className="text-xl sm:text-2xl font-bold">
-                {format(currentDate, 'yyyy년 M월', { locale: ko })}
-              </h2>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleNextMonth}
-                className="text-white hover:bg-blue-700 touch-friendly"
-              >
-                {!isMobile && <span className="mr-2">다음</span>}
-                <ChevronRight className="h-5 w-5" />
-              </Button>
+        {/* Day Headers */}
+        <div className="grid grid-cols-7 bg-gray-50 border-b">
+          {['일', '월', '화', '수', '목', '금', '토'].map((day, index) => (
+            <div 
+              key={day} 
+              className={`p-3 text-center text-sm font-medium ${
+                index === 0 ? 'text-red-600' : index === 6 ? 'text-blue-600' : 'text-gray-700'
+              }`}
+            >
+              {day}
             </div>
-          </div>
+          ))}
+        </div>
 
-          {/* Day Headers */}
-          <div className="grid grid-cols-7 bg-gray-50 border-b">
-            {['일', '월', '화', '수', '목', '금', '토'].map((day, index) => (
-              <div 
-                key={day} 
-                className={`p-3 text-center text-sm font-medium ${
-                  index === 0 ? 'text-red-600' : index === 6 ? 'text-blue-600' : 'text-gray-700'
-                }`}
+        {/* Calendar Grid */}
+        <div className="grid grid-cols-7">
+          {calendarDays.map((date, index) => {
+            const shift = getShiftForDate(date)
+            const isSelected = selectedDate && isSameDay(date, selectedDate)
+            const isCurrentDateToday = isToday(date)
+            const isInCurrentMonth = isCurrentMonth(date)
+
+            return (
+              <div
+                key={date.toISOString()}
+                className={`
+                  relative border-b border-r border-gray-200 cursor-pointer
+                  transition-all duration-200
+                  ${isMobile ? 'mobile-calendar-cell' : 'p-3 min-h-[80px]'}
+                  ${isSelected ? 'bg-blue-50 ring-2 ring-blue-500' : ''}
+                  ${isCurrentDateToday ? 'bg-yellow-50' : ''}
+                  ${!isInCurrentMonth ? 'bg-gray-50/50' : ''}
+                  hover:bg-gray-50
+                `}
+                onClick={() => handleDateClick(date)}
               >
-                {day}
-              </div>
-            ))}
-          </div>
-
-          {/* Calendar Grid */}
-          <div className="grid grid-cols-7">
-            {calendarDays.map((date, index) => {
-              const shift = getShiftForDate(date)
-              const isSelected = selectedDate && isSameDay(date, selectedDate)
-              const isCurrentDateToday = isToday(date)
-              const isInCurrentMonth = isCurrentMonth(date)
-
-              return (
-                <div
-                  key={date.toISOString()}
-                  className={`
-                    relative border-b border-r border-gray-200 cursor-pointer
-                    transition-all duration-200
-                    ${isMobile ? 'mobile-calendar-cell' : 'p-3 min-h-[80px]'}
-                    ${isSelected ? 'bg-blue-100 ring-2 ring-blue-500' : ''}
-                    ${isCurrentDateToday ? 'bg-blue-50' : ''}
-                    ${!isInCurrentMonth ? 'bg-gray-50 text-gray-400' : 'hover:bg-gray-50'}
-                    touch-friendly
-                  `}
-                  onClick={() => handleDateClick(date)}
-                >
-                  <div className={`
-                    text-sm font-medium
-                    ${isCurrentDateToday ? 'bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center' : ''}
-                    ${index % 7 === 0 ? 'text-red-600' : index % 7 === 6 ? 'text-blue-600' : 'text-gray-900'}
-                  `}>
+                <div className="flex flex-col h-full">
+                  <div className={`text-sm font-medium mb-1 ${
+                    !isInCurrentMonth ? 'text-gray-300' :
+                    isCurrentDateToday ? 'text-blue-600 font-bold' : 
+                    index % 7 === 0 ? 'text-red-600' : 
+                    index % 7 === 6 ? 'text-blue-600' : 
+                    'text-gray-700'
+                  }`}>
                     {format(date, 'd')}
                   </div>
+                  
                   {shift && isInCurrentMonth && (
                     <div className={`
-                      mt-1 px-2 py-1 rounded text-xs border
-                      ${isMobile ? 'mobile-shift-badge' : ''}
+                      inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border
                       ${shiftConfig[shift.shiftType].color}
+                      ${isMobile ? 'text-xs' : ''}
                     `}>
-                      <div className="flex items-center space-x-1">
-                        <span className="text-xs">{shiftConfig[shift.shiftType].emoji}</span>
-                        {!isMobile && <span>{shiftConfig[shift.shiftType].label}</span>}
-                      </div>
+                      <span className="mr-1">{shiftConfig[shift.shiftType].emoji}</span>
+                      <span>{shiftConfig[shift.shiftType].label}</span>
                     </div>
                   )}
                 </div>
-              )
-            })}
-          </div>
+              </div>
+            )
+          })}
         </div>
 
-        {/* Shift Selection Panel */}
+        {/* Bottom Panel for Shift Selection */}
         {selectedDate && (
-          <div className="mt-6 bg-white rounded-xl shadow-lg p-6 calendar-fade-in">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              {format(selectedDate, 'M월 d일 (E)', { locale: ko })} 근무 설정
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {Object.entries(shiftConfig).map(([shiftType, config]) => {
-                const Icon = config.icon
-                return (
-                  <Button
-                    key={shiftType}
-                    variant="outline"
-                    className={`
-                      flex flex-col items-center justify-center space-y-2 p-4 h-20
-                      touch-friendly transition-all duration-200
-                      ${config.color} hover:scale-105
-                    `}
-                    onClick={() => updateShiftForDate(selectedDate, shiftType as ShiftType)}
-                    disabled={loading}
-                  >
-                    <Icon className="h-6 w-6" />
-                    <span className="text-sm font-medium">{config.label}</span>
-                  </Button>
-                )
-              })}
+          <div className="bg-gray-50 p-4 border-t">
+            <div className="flex flex-col space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {format(selectedDate, 'M월 d일 (E)', { locale: ko })}
+                </h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedDate(null)}
+                  className="touch-friendly"
+                >
+                  닫기
+                </Button>
+              </div>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {Object.entries(shiftConfig).map(([key, config]) => {
+                  const Icon = config.icon
+                  return (
+                    <Button
+                      key={key}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateShiftForDate(selectedDate, key as ShiftType)}
+                      disabled={loading}
+                      className={`
+                        touch-friendly flex items-center justify-center space-x-2 h-12
+                        ${config.color}
+                        hover:opacity-80 transition-opacity
+                      `}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span className="text-sm font-medium">{config.label}</span>
+                    </Button>
+                  )
+                })}
+              </div>
             </div>
           </div>
         )}
+      </div>
 
-        {/* 범례 */}
-        <div className="mt-6 bg-white rounded-xl shadow-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">근무 형태 안내</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {Object.entries(shiftConfig).map(([shiftType, config]) => {
-              const Icon = config.icon
-              return (
-                <div key={shiftType} className="flex items-center space-x-2">
-                  <Icon className="h-5 w-5 text-gray-600" />
-                  <span className="text-sm text-gray-700">{config.label}</span>
-                </div>
-              )
-            })}
-          </div>
+      {/* Legend */}
+      <div className="mt-6 bg-white rounded-lg shadow p-4">
+        <h3 className="text-sm font-medium text-gray-700 mb-3">근무 종류</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {Object.entries(shiftConfig).map(([key, config]) => (
+            <div key={key} className="flex items-center space-x-2">
+              <div className={`w-4 h-4 rounded-full ${config.color.split(' ')[0]}`} />
+              <span className="text-sm text-gray-700">{config.label}</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>

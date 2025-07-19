@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import Calendar from '@/components/calendar'
+import Header from '@/components/header'
 import { Loader2 } from 'lucide-react'
 
 export default function Home() {
@@ -30,7 +31,10 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
-      <Calendar />
+      <Header />
+      <div className="pt-4">
+        <Calendar />
+      </div>
     </div>
   )
 }
