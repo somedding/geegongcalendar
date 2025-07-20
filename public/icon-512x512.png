@@ -1,0 +1,14 @@
+<!-- This would need to be converted to PNG format -->
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" rx="64" fill="#3B82F6"/>
+  <rect x="64" y="85" width="384" height="384" rx="32" ry="32" fill="none" stroke="white" stroke-width="16"/>
+  <line x1="341" y1="43" x2="341" y2="128" stroke="white" stroke-width="16" stroke-linecap="round"/>
+  <line x1="171" y1="43" x2="171" y2="128" stroke="white" stroke-width="16" stroke-linecap="round"/>
+  <line x1="64" y1="213" x2="448" y2="213" stroke="white" stroke-width="16"/>
+  <circle cx="171" cy="299" r="8" fill="white"/>
+  <circle cx="256" cy="299" r="8" fill="white"/>
+  <circle cx="341" cy="299" r="8" fill="white"/>
+  <circle cx="171" cy="384" r="8" fill="white"/>
+  <circle cx="256" cy="384" r="8" fill="white"/>
+  <circle cx="341" cy="384" r="8" fill="white"/>
+</svg> 

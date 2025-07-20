@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import Calendar from '@/components/calendar'
 import Header from '@/components/header'
+import PWAInstall from '@/components/pwa-install'
 import { Loader2 } from 'lucide-react'
 
 export default function Home() {
@@ -35,6 +36,7 @@ export default function Home() {
       <div className="pt-4">
         <Calendar />
       </div>
+      <PWAInstall />
     </div>
   )
 }

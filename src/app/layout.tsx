@@ -6,8 +6,20 @@ import { SessionProvider } from '@/components/session-provider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: '교대 근무 달력',
-  description: '주야비휴 교대 근무를 위한 달력 앱',
+  title: '기공 캘린더',
+  description: '교대 근무 일정 관리 캘린더',
+  manifest: '/manifest.json',
+  themeColor: '#3B82F6',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: '기공캘린더',
+  },
+  icons: {
+    icon: '/calendar.svg',
+    apple: '/icon-192x192.png',
+  },
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover',
 }
 //update
 export default function RootLayout({
@@ -23,6 +35,14 @@ export default function RootLayout({
           rel="stylesheet" 
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" 
         />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#3B82F6" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="기공캘린더" />
+        <link rel="apple-touch-icon" href="/icon-192x192.png" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="application-name" content="기공캘린더" />
         <style>{`
           * {
             font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
@@ -31,25 +51,17 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              // Service Worker 제거 스크립트
+              // Service Worker 등록
               if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                  for(let registration of registrations) {
-                    registration.unregister();
-                  }
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                      console.log('SW registered: ', registration);
+                    })
+                    .catch(function(registrationError) {
+                      console.log('SW registration failed: ', registrationError);
+                    });
                 });
-              }
-              
-              // OAuth 콜백 URL에 대한 Service Worker 우회 설정
-              if (typeof window !== 'undefined' && window.location.pathname.includes('/api/auth/')) {
-                // Service Worker가 OAuth 콜백을 처리하지 않도록 강제 설정
-                if ('serviceWorker' in navigator) {
-                  navigator.serviceWorker.getRegistration().then(function(registration) {
-                    if (registration) {
-                      registration.unregister();
-                    }
-                  });
-                }
               }
             `,
           }}
