@@ -1,4 +1,3 @@
 {
-  "buildCommand": "prisma generate && prisma db push && next build",
-  "installCommand": "npm ci"
+  "buildCommand": "cp prisma/schema.prod.prisma prisma/schema.prisma && prisma generate && prisma db push && next build"
 } 
