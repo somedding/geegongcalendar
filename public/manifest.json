@@ -1,6 +1,6 @@
 {
-  "name": "기공 캘린더",
-  "short_name": "기공캘린더",
+  "name": "교대 근무 달력",
+  "short_name": "교대근무달력",
   "description": "교대 근무 일정 관리 캘린더",
   "start_url": "/",
   "display": "standalone",

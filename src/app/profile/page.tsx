@@ -90,7 +90,7 @@ export default function ProfilePage() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="flex justify-center items-center min-h-screen bg-gray-100">
         <div className="text-center">로딩 중...</div>
       </div>
     )
@@ -101,9 +101,9 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <div className="max-w-md mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
-        <div className="bg-blue-500 p-6 text-center">
+    <div className="p-4 min-h-screen bg-gray-100">
+      <div className="overflow-hidden mx-auto max-w-md bg-white rounded-2xl shadow-lg">
+        <div className="p-6 text-center bg-blue-500">
           <h1 className="text-xl font-bold text-white">프로필 편집</h1>
         </div>
 
@@ -111,26 +111,26 @@ export default function ProfilePage() {
           {/* 역 정보 */}
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 역 이름
               </label>
               <input
                 type="text"
                 value={profile.stationName}
                 onChange={(e) => handleInputChange('stationName', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="예: 흑대입구 역"
+                className="px-3 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="예: 홍대입구 역"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 조
               </label>
               <select
                 value={profile.teamName}
                 onChange={(e) => handleInputChange('teamName', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="A조">A조</option>
                 <option value="B조">B조</option>
@@ -145,20 +145,20 @@ export default function ProfilePage() {
             <h3 className="text-lg font-semibold text-gray-800">연차 정보</h3>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 총 연차 개수
               </label>
               <input
                 type="number"
                 value={profile.totalAnnualLeave}
                 onChange={(e) => handleInputChange('totalAnnualLeave', parseInt(e.target.value) || 0)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 min="0"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 사용한 연차 개수
               </label>
               <input
@@ -166,7 +166,7 @@ export default function ProfilePage() {
                 step="0.5"
                 value={profile.usedAnnualLeave}
                 onChange={(e) => handleInputChange('usedAnnualLeave', parseFloat(e.target.value) || 0)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 min="0"
                 max={profile.totalAnnualLeave}
               />
@@ -182,27 +182,27 @@ export default function ProfilePage() {
             <h3 className="text-lg font-semibold text-gray-800">병가 정보</h3>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 총 병가 개수
               </label>
               <input
                 type="number"
                 value={profile.totalSickLeave}
                 onChange={(e) => handleInputChange('totalSickLeave', parseInt(e.target.value) || 0)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 min="0"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 사용한 병가 개수
               </label>
               <input
                 type="number"
                 value={profile.usedSickLeave}
                 onChange={(e) => handleInputChange('usedSickLeave', parseInt(e.target.value) || 0)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 min="0"
                 max={profile.totalSickLeave}
               />
@@ -218,27 +218,27 @@ export default function ProfilePage() {
             <h3 className="text-lg font-semibold text-gray-800">특별휴가 정보</h3>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 총 특별휴가 개수
               </label>
               <input
                 type="number"
                 value={profile.totalSpecialLeave}
                 onChange={(e) => handleInputChange('totalSpecialLeave', parseInt(e.target.value) || 0)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 min="0"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 사용한 특별휴가 개수
               </label>
               <input
                 type="number"
                 value={profile.usedSpecialLeave}
                 onChange={(e) => handleInputChange('usedSpecialLeave', parseInt(e.target.value) || 0)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 min="0"
                 max={profile.totalSpecialLeave}
               />
@@ -254,7 +254,7 @@ export default function ProfilePage() {
             <h3 className="text-lg font-semibold text-gray-800">추가휴무 정보</h3>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 사용한 추가휴무 개수
               </label>
               <input
@@ -262,7 +262,7 @@ export default function ProfilePage() {
                 step="0.5"
                 value={profile.usedExtraDaysOff}
                 onChange={(e) => handleInputChange('usedExtraDaysOff', parseFloat(e.target.value) || 0)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 min="0"
               />
             </div>
@@ -273,7 +273,7 @@ export default function ProfilePage() {
           </div>
 
           {/* 버튼들 */}
-          <div className="flex space-x-3 pt-4">
+          <div className="flex pt-4 space-x-3">
             <Button
               onClick={() => router.push('/')}
               variant="outline"
