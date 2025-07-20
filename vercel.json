@@ -1,0 +1,7 @@
+{
+  "buildCommand": "prisma generate && prisma db push && next build",
+  "installCommand": "npm ci",
+  "env": {
+    "DATABASE_URL": "@database_url"
+  }
+} 
