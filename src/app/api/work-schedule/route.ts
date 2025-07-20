@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
 import { PrismaClient } from '@prisma/client'
 import { startOfMonth, endOfMonth, parseISO } from 'date-fns'
+import { Session } from 'next-auth'
 
 const prisma = new PrismaClient()
 
 export async function GET(request: NextRequest) {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions) as Session | null
   
-  if (!session?.user?.id) {
+  if (!session || !session.user || !session.user.id) {
     return NextResponse.json({ error: '인증되지 않은 사용자입니다.' }, { status: 401 })
   }
 
@@ -46,9 +47,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions) as Session | null
   
-  if (!session?.user?.id) {
+  if (!session || !session.user || !session.user.id) {
     return NextResponse.json({ error: '인증되지 않은 사용자입니다.' }, { status: 401 })
   }
 
@@ -84,9 +85,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions) as Session | null
   
-  if (!session?.user?.id) {
+  if (!session || !session.user || !session.user.id) {
     return NextResponse.json({ error: '인증되지 않은 사용자입니다.' }, { status: 401 })
   }
 

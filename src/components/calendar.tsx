@@ -5,7 +5,6 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, getDay } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import { getMonthlyHolidayCount, isKoreanHoliday, getHolidayName } from '@/lib/holidays'
 
@@ -44,6 +43,8 @@ const shiftConfig = {
 
 export default function Calendar() {
   const { data: session } = useSession()
+  // session은 향후 사용을 위해 유지
+  console.log('Session:', session)
   const router = useRouter()
   const [currentDate, setCurrentDate] = useState(new Date())
   const [workSchedules, setWorkSchedules] = useState<WorkSchedule[]>([])
@@ -340,7 +341,7 @@ export default function Calendar() {
         const currentShiftType = currentShift.shiftType as ShiftType
         if (currentShiftType === 'holiday') {
           alert('이미 휴일인 날짜에는 휴가를 사용할 수 없습니다.')
-        } else if (currentShiftType === 'night' || currentShiftType === 'off' || currentShiftType === 'holiday') {
+        } else if (currentShiftType === 'night' || currentShiftType === 'off') {
           alert('야간/비번/휴일에는 반차를 사용할 수 없습니다.')
         }
             return
@@ -366,8 +367,8 @@ export default function Calendar() {
 
       setPendingShiftType(shiftType)
       setShowLeaveSelectionModal(true)
-      return
-    }
+            return
+          }
 
         // '휴' 타입 선택 시 처리
     if (shiftType === 'holiday') {
@@ -390,13 +391,13 @@ export default function Calendar() {
       
       // 주간을 휴로 바꾸는 경우만 추가휴무 차감 체크
       if (currentShift.shiftType === 'day') {
-        const availableExtra = getAdditionalDaysOff()
+          const availableExtra = getAdditionalDaysOff()
         if (availableExtra < 1) {
           alert(`추가휴무가 부족합니다.\n\n현재 사용 가능한 추가휴무: ${availableExtra}개\n필요한 추가휴무: 1개\n\n추가휴무를 사용할 수 없습니다.`)
-          return
+            return
+          }
         }
       }
-    }
 
     // 일반 시프트 변경
     updateShiftForDate(selectedDate, shiftType)
@@ -498,8 +499,10 @@ export default function Calendar() {
     }
 
     // 야간/비번에 휴가 사용 시 다음 날짜도 함께 변경
-    if ((currentShift.shiftType === 'night' || currentShift.shiftType === 'off') && 
-        (actualShiftType === 'annual' || actualShiftType === 'special' || actualShiftType === 'sick' || actualShiftType === 'extra_half')) {
+    const shiftType = currentShift.shiftType as string
+    const isNightOrOff = shiftType === 'night' || shiftType === 'off'
+    const isLeaveType = actualShiftType === 'annual' || actualShiftType === 'special' || actualShiftType === 'sick' || actualShiftType === 'extra_half'
+    if (isNightOrOff && isLeaveType) {
       
       // 다음 날짜 계산 (야간→비번, 비번→야간)
       const nextDate = new Date(selectedDate)
@@ -666,58 +669,60 @@ export default function Calendar() {
     <div className="p-4 min-h-screen bg-gray-100">
       <div className="overflow-hidden mx-auto max-w-md bg-white rounded-2xl shadow-lg">
         {/* 상단 정보 */}
-        <div className="p-6 text-center bg-gray-200">
-          <h1 className="mb-2 text-xl font-bold text-gray-800">
+        <div className="px-6 py-8 text-center bg-gradient-to-b from-blue-50 to-blue-100">
+          <h1 className="mb-3 text-2xl font-bold text-gray-900">
             {userProfile.stationName}
           </h1>
-          <p className="mb-3 text-lg text-gray-700">
+          <p className="mb-4 text-xl font-semibold text-blue-700">
             {userProfile.teamName}
           </p>
-          <p className="text-base text-gray-600">
-            오늘 근무는 <span className="font-medium text-red-500">{getTodayShift()}</span> 입니다
-          </p>
+          <div className="px-4 py-2 bg-white rounded-full shadow-sm">
+            <p className="text-lg font-medium text-gray-700">
+              오늘 근무: <span className="font-bold text-red-600">{getTodayShift()}</span>
+            </p>
+          </div>
         </div>
 
         {/* 달력 헤더 */}
-        <div className="flex justify-between items-center p-4 border-b">
+        <div className="flex justify-between items-center px-6 py-4 bg-white border-b border-gray-100">
           <button 
             onClick={handlePrevMonth}
-            className="p-2 rounded-full transition-colors hover:bg-gray-100"
+            className="p-3 rounded-full transition-colors hover:bg-blue-50 active:bg-blue-100"
           >
             <Image
               src="/Arrow left-circle.svg"
               alt="이전 월"
-              width={24}
-              height={24}
+              width={28}
+              height={28}
             />
           </button>
           
-          <h2 className="text-xl font-bold text-gray-800">
+          <h2 className="text-2xl font-bold tracking-tight text-gray-900">
             {format(currentDate, 'yyyy년 M월', { locale: ko })}
           </h2>
           
           <button 
             onClick={handleNextMonth}
-            className="p-2 rounded-full transition-colors hover:bg-gray-100"
+            className="p-3 rounded-full transition-colors hover:bg-blue-50 active:bg-blue-100"
           >
             <Image
               src="/Arrow right-circle.svg"
               alt="다음 월"
-              width={24}
-              height={24}
+              width={28}
+              height={28}
             />
           </button>
         </div>
 
         {/* 요일 헤더 */}
-        <div className="grid grid-cols-7 border-b">
+        <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-200">
           {['일', '월', '화', '수', '목', '금', '토'].map((day, index) => (
             <div 
               key={day} 
-              className={`p-3 text-center text-sm font-medium ${
-                index === 0 ? 'text-red-500' : 
-                index === 6 ? 'text-blue-500' : 
-                'text-gray-700'
+              className={`py-4 text-center text-base font-semibold ${
+                index === 0 ? 'text-red-600' : 
+                index === 6 ? 'text-blue-600' : 
+                'text-gray-800'
               }`}
             >
               {day}
@@ -738,21 +743,21 @@ export default function Calendar() {
               <div
                 key={date.toISOString()}
                 className={`
-                  relative h-16 border-r border-b border-gray-200 cursor-pointer
-                  flex flex-col items-center justify-center
-                  ${isSelected ? 'bg-blue-50' : ''}
-                  ${isCurrentDateToday ? 'bg-yellow-50' : ''}
-                  ${!isInCurrentMonth ? 'bg-gray-50 opacity-50' : 'hover:bg-gray-50'}
+                  relative h-20 border-r border-b border-gray-100 cursor-pointer
+                  flex flex-col items-center justify-center transition-colors
+                  ${isSelected ? 'bg-blue-100 border-blue-300' : ''}
+                  ${isCurrentDateToday ? 'bg-yellow-100 border-yellow-300' : ''}
+                  ${!isInCurrentMonth ? 'bg-gray-50 opacity-50' : 'hover:bg-gray-50 active:bg-gray-100'}
                 `}
                 onClick={() => handleDateClick(date)}
               >
-                <span className={`text-sm font-medium mb-1 ${
+                <span className={`text-lg font-semibold mb-1 ${
                   !isInCurrentMonth ? 'text-gray-300' :
-                  isCurrentDateToday ? 'text-blue-600 font-bold' : 
-                  isHoliday ? 'text-red-500 font-bold' : // 공휴일은 빨간색으로
-                  index % 7 === 0 ? 'text-red-500' : 
-                  index % 7 === 6 ? 'text-blue-500' : 
-                  'text-gray-700'
+                  isCurrentDateToday ? 'text-blue-700 font-bold' : 
+                  isHoliday ? 'text-red-600 font-bold' : // 공휴일은 빨간색으로
+                  index % 7 === 0 ? 'text-red-600' : 
+                  index % 7 === 6 ? 'text-blue-600' : 
+                  'text-gray-800'
                 }`}>
                   {format(date, 'd')}
                 </span>
@@ -761,8 +766,8 @@ export default function Calendar() {
                   <Image
                     src={shiftConfig[shift.shiftType].icon}
                     alt={shiftConfig[shift.shiftType].label}
-                    width={20}
-                    height={20}
+                    width={24}
+                    height={24}
                   />
                 )}
               </div>
@@ -771,26 +776,30 @@ export default function Calendar() {
         </div>
 
         {/* 하단 정보 */}
-        <div className="p-6 bg-white">
-          <div className="mb-4 space-y-2">
-            <p className="text-sm text-gray-700">
-              남은 연차: <span className="font-medium">{userProfile.totalAnnualLeave - userProfile.usedAnnualLeave}개</span>
-            </p>
-            <p className="text-sm text-gray-700">
-              남은 특별휴가: <span className="font-medium">{userProfile.totalSpecialLeave - userProfile.usedSpecialLeave}개</span>
-            </p>
-            <p className="text-sm text-gray-700">
-              남은 병가: <span className="font-medium">{userProfile.totalSickLeave - userProfile.usedSickLeave}개</span>
-            </p>
-            <p className="text-sm text-gray-700">
-              이번달 추가 휴무: <span className="font-medium">{getAdditionalDaysOff()}개</span>
-            </p>
+        <div className="px-6 py-8 bg-gradient-to-b from-white to-gray-50">
+          <div className="mb-6 space-y-4">
+            <div className="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+              <span className="text-base font-medium text-gray-700">남은 연차</span>
+              <span className="text-xl font-bold text-blue-600">{userProfile.totalAnnualLeave - userProfile.usedAnnualLeave}개</span>
+            </div>
+            <div className="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+              <span className="text-base font-medium text-gray-700">남은 특별휴가</span>
+              <span className="text-xl font-bold text-green-600">{userProfile.totalSpecialLeave - userProfile.usedSpecialLeave}개</span>
+            </div>
+            <div className="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+              <span className="text-base font-medium text-gray-700">남은 병가</span>
+              <span className="text-xl font-bold text-purple-600">{userProfile.totalSickLeave - userProfile.usedSickLeave}개</span>
+            </div>
+            <div className="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+              <span className="text-base font-medium text-gray-700">이번달 추가휴무</span>
+              <span className="text-xl font-bold text-orange-600">{getAdditionalDaysOff()}개</span>
+            </div>
           </div>
           
-          <div className="flex justify-end">
+          <div className="flex justify-center">
             <button
               onClick={handleRecordsClick}
-              className="text-sm font-medium text-blue-500 transition-colors hover:text-blue-600"
+              className="px-6 py-3 text-base font-semibold text-white bg-blue-600 rounded-xl shadow-md transition-colors hover:bg-blue-700 active:bg-blue-800"
             >
               기록보기
             </button>

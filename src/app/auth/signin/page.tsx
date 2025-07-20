@@ -1,12 +1,13 @@
 'use client'
 
-import { signIn, getProviders } from 'next-auth/react'
-import { useEffect, useState } from 'react'
+import { signIn, getProviders, LiteralUnion, ClientSafeProvider } from 'next-auth/react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { BuiltInProviderType } from 'next-auth/providers/index'
 
-export default function SignIn() {
-  const [providers, setProviders] = useState<any>(null)
+function SignInContent() {
+  const [providers, setProviders] = useState<Record<LiteralUnion<BuiltInProviderType, string>, ClientSafeProvider> | null>(null)
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/'
 
@@ -32,7 +33,7 @@ export default function SignIn() {
         
         <div className="space-y-4">
           {providers &&
-            Object.values(providers).map((provider: any) => (
+            Object.values(providers).map((provider) => (
               <div key={provider.name}>
                 <Button
                   onClick={() => signIn(provider.id, { callbackUrl })}
@@ -65,5 +66,13 @@ export default function SignIn() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function SignIn() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SignInContent />
+    </Suspense>
   )
 } 

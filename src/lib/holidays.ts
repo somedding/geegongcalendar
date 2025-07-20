@@ -1,4 +1,4 @@
-import { format, getDay, addDays, subDays } from 'date-fns'
+import { format, getDay, addDays } from 'date-fns'
 
 export interface Holiday {
   date: Date
