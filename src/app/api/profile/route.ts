@@ -32,7 +32,10 @@ export async function GET() {
           totalAnnualLeave: 15,
           usedAnnualLeave: 0,
           totalSickLeave: 30,
-          usedSickLeave: 0
+          usedSickLeave: 0,
+          totalSpecialLeave: 5,
+          usedSpecialLeave: 0,
+          usedExtraDaysOff: 0
         }
       })
       
@@ -58,7 +61,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { stationName, teamName, totalAnnualLeave, usedAnnualLeave, totalSickLeave, usedSickLeave } = body
+    const { stationName, teamName, totalAnnualLeave, usedAnnualLeave, totalSickLeave, usedSickLeave, totalSpecialLeave, usedSpecialLeave, usedExtraDaysOff } = body
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
@@ -76,7 +79,10 @@ export async function POST(request: NextRequest) {
         totalAnnualLeave,
         usedAnnualLeave,
         totalSickLeave,
-        usedSickLeave
+        usedSickLeave,
+        totalSpecialLeave,
+        usedSpecialLeave,
+        usedExtraDaysOff
       },
       create: {
         userId: user.id,
@@ -85,7 +91,10 @@ export async function POST(request: NextRequest) {
         totalAnnualLeave: totalAnnualLeave || 15,
         usedAnnualLeave: usedAnnualLeave || 0,
         totalSickLeave: totalSickLeave || 30,
-        usedSickLeave: usedSickLeave || 0
+        usedSickLeave: usedSickLeave || 0,
+        totalSpecialLeave: totalSpecialLeave || 5,
+        usedSpecialLeave: usedSpecialLeave || 0,
+        usedExtraDaysOff: usedExtraDaysOff || 0
       }
     })
 

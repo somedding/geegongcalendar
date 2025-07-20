@@ -13,6 +13,9 @@ interface UserProfile {
   usedAnnualLeave: number
   totalSickLeave: number
   usedSickLeave: number
+  totalSpecialLeave: number
+  usedSpecialLeave: number
+  usedExtraDaysOff: number
 }
 
 export default function ProfilePage() {
@@ -160,8 +163,9 @@ export default function ProfilePage() {
               </label>
               <input
                 type="number"
+                step="0.5"
                 value={profile.usedAnnualLeave}
-                onChange={(e) => handleInputChange('usedAnnualLeave', parseInt(e.target.value) || 0)}
+                onChange={(e) => handleInputChange('usedAnnualLeave', parseFloat(e.target.value) || 0)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 min="0"
                 max={profile.totalAnnualLeave}
@@ -206,6 +210,65 @@ export default function ProfilePage() {
 
             <div className="text-sm text-gray-600">
               남은 병가: {profile.totalSickLeave - profile.usedSickLeave}개
+            </div>
+          </div>
+
+          {/* 특별휴가 정보 */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-800">특별휴가 정보</h3>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                총 특별휴가 개수
+              </label>
+              <input
+                type="number"
+                value={profile.totalSpecialLeave}
+                onChange={(e) => handleInputChange('totalSpecialLeave', parseInt(e.target.value) || 0)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                min="0"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                사용한 특별휴가 개수
+              </label>
+              <input
+                type="number"
+                value={profile.usedSpecialLeave}
+                onChange={(e) => handleInputChange('usedSpecialLeave', parseInt(e.target.value) || 0)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                min="0"
+                max={profile.totalSpecialLeave}
+              />
+            </div>
+
+            <div className="text-sm text-gray-600">
+              남은 특별휴가: {profile.totalSpecialLeave - profile.usedSpecialLeave}개
+            </div>
+          </div>
+
+          {/* 추가휴무 정보 */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-800">추가휴무 정보</h3>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                사용한 추가휴무 개수
+              </label>
+              <input
+                type="number"
+                step="0.5"
+                value={profile.usedExtraDaysOff}
+                onChange={(e) => handleInputChange('usedExtraDaysOff', parseFloat(e.target.value) || 0)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                min="0"
+              />
+            </div>
+
+            <div className="text-sm text-gray-600">
+              추가휴무는 주말 개수에서 휴일 개수를 뺀 값에서 사용량을 차감한 값입니다.
             </div>
           </div>
 
