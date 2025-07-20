@@ -1,62 +1,97 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export async function PUT(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session || !session.user?.email) {
-      return NextResponse.json({ error: '인증되지 않은 사용자입니다' }, { status: 401 })
-    }
-
-    const body = await request.json()
-    const { name } = body
-
-    // 사용자 정보 업데이트
-    const updatedUser = await prisma.user.update({
-      where: {
-        email: session.user.email
-      },
-      data: {
-        name: name || session.user.name
-      }
-    })
-
-    return NextResponse.json({
-      message: '프로필이 성공적으로 업데이트되었습니다',
-      user: updatedUser
-    })
-  } catch (error) {
-    console.error('프로필 업데이트 오류:', error)
-    return NextResponse.json({ error: '프로필 업데이트 중 오류가 발생했습니다' }, { status: 500 })
-  }
-}
-
 export async function GET() {
-  try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session || !session.user?.email) {
-      return NextResponse.json({ error: '인증되지 않은 사용자입니다' }, { status: 401 })
-    }
+  const session = await getServerSession(authOptions)
+  
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
+  try {
     const user = await prisma.user.findUnique({
-      where: {
-        email: session.user.email
-      }
+      where: { email: session.user.email },
+      include: { profile: true }
     })
 
     if (!user) {
-      return NextResponse.json({ error: '사용자를 찾을 수 없습니다' }, { status: 404 })
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    return NextResponse.json({ user })
+    // 프로필이 없으면 기본 프로필 생성
+    if (!user.profile) {
+      const profile = await prisma.userProfile.create({
+        data: {
+          userId: user.id,
+          stationName: '역 이름',
+          teamName: 'A조',
+          totalAnnualLeave: 15,
+          usedAnnualLeave: 0,
+          totalSickLeave: 30,
+          usedSickLeave: 0
+        }
+      })
+      
+      return NextResponse.json({
+        ...user,
+        profile
+      })
+    }
+
+    return NextResponse.json(user)
   } catch (error) {
-    console.error('프로필 조회 오류:', error)
-    return NextResponse.json({ error: '프로필 조회 중 오류가 발생했습니다' }, { status: 500 })
+    console.error('Profile fetch error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions)
+  
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const body = await request.json()
+    const { stationName, teamName, totalAnnualLeave, usedAnnualLeave, totalSickLeave, usedSickLeave } = body
+
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    })
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    const profile = await prisma.userProfile.upsert({
+      where: { userId: user.id },
+      update: {
+        stationName,
+        teamName,
+        totalAnnualLeave,
+        usedAnnualLeave,
+        totalSickLeave,
+        usedSickLeave
+      },
+      create: {
+        userId: user.id,
+        stationName: stationName || '역 이름',
+        teamName: teamName || 'A조',
+        totalAnnualLeave: totalAnnualLeave || 15,
+        usedAnnualLeave: usedAnnualLeave || 0,
+        totalSickLeave: totalSickLeave || 30,
+        usedSickLeave: usedSickLeave || 0
+      }
+    })
+
+    return NextResponse.json(profile)
+  } catch (error) {
+    console.error('Profile update error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 } 
