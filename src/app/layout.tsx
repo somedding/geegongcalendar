@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: '교대 근무 달력',
   description: '주야비휴 교대 근무를 위한 달력 앱',
 }
-
+//update
 export default function RootLayout({
   children,
 }: {
